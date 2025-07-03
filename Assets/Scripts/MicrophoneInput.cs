@@ -5,23 +5,23 @@ public class MicrophoneInput : MonoBehaviour
     public AudioClip micClip;
     public int sampleLength = 1024;
     public float[] samples;
-    int micSampleRate;
-    string micName;
+    private int _micSampleRate;
+    private string _micName;
 
-    void Start()
+    private void Start()
     {
         samples = new float[sampleLength];
-        micName = Microphone.devices[0];
-        micSampleRate = AudioSettings.outputSampleRate;
+        _micName = Microphone.devices[0];
+        _micSampleRate = AudioSettings.outputSampleRate;
 
-        micClip = Microphone.Start(micName, true, 10, micSampleRate);
+        micClip = Microphone.Start(_micName, true, 10, _micSampleRate);
     }
 
-    void Update()
+    private void Update()
     {
-        if (!Microphone.IsRecording(micName)) return;
-        int micPos = Microphone.GetPosition(micName);
-        int startPos = micPos - sampleLength;
+        if (!Microphone.IsRecording(_micName)) return;
+        var micPos = Microphone.GetPosition(_micName);
+        var startPos = micPos - sampleLength;
 
         if (startPos < 0) return;
 

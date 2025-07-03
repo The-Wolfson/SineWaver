@@ -4,17 +4,16 @@ using System;
 public class AudioManager : MonoBehaviour
 {
     public MicrophoneInput micInput;
-    public int sampleLength => micInput.sampleLength; // Number of samples to extract per frame
+    public int SampleLength => micInput.sampleLength; // Number of samples to extract per frame
 
     // Reference level for dB calculation (full scale digital audio)
-    private const float DB_REF = 1.0f;
+    private const float DBRef = 1.0f;
 
     // Minimum dB value to display (below this will be considered silence)
-    public static readonly float MinimumDB = -80.0f;
+    public const float MinimumDB = -80.0f;
 
     // Audio metrics
-    public float CurrentVolumeDb { get; private set; }
-    public float CurrentDominantFrequency { get; private set; }
+    private float CurrentVolumeDb { get; set; }
     public float[] AudioSamples => micInput?.samples;
 
     // Events
@@ -27,31 +26,29 @@ public class AudioManager : MonoBehaviour
 
     private void UpdateAudioMetrics()
     {
-        float[] samples = AudioSamples;
+        var samples = AudioSamples;
         if (samples == null || samples.Length == 0) return;
 
         // Calculate volume in dB
-        float volumeDb = CalculateVolumeDb(samples);
-        if (volumeDb != CurrentVolumeDb)
-        {
-            CurrentVolumeDb = volumeDb;
-            OnVolumeChanged?.Invoke(CurrentVolumeDb);
-        }
+        var volumeDb = CalculateVolumeDb(samples);
+        if (volumeDb == CurrentVolumeDb) return;
+        CurrentVolumeDb = volumeDb;
+        OnVolumeChanged?.Invoke(CurrentVolumeDb);
     }
 
-    public float CalculateVolumeDb(float[] samples)
+    public static float CalculateVolumeDb(float[] samples)
     {
         // Calculate RMS (Root Mean Square) amplitude
         float sum = 0;
-        for (int i = 0; i < samples.Length; i++)
+        for (var i = 0; i < samples.Length; i++)
         {
             sum += samples[i] * samples[i];
         }
 
-        float rms = Mathf.Sqrt(sum / samples.Length);
+        var rms = Mathf.Sqrt(sum / samples.Length);
 
         // Convert RMS to dB
-        float db = 20 * Mathf.Log10(rms / DB_REF);
+        var db = 20 * Mathf.Log10(rms / DBRef);
 
         // Clamp to minimum value to avoid -Infinity for silence
         return Mathf.Max(db, MinimumDB);

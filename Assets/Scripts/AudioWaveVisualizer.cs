@@ -1,57 +1,47 @@
 using UnityEngine;
-using TMPro;
-using System;
 
 [RequireComponent(typeof(LineRenderer))]
 public class AudioWaveVisualizer : MonoBehaviour
 {
     public AudioManager audioManager;
-    private LineRenderer lineRenderer;
+    private LineRenderer _lineRenderer;
 
-    private int pointCount
+    private int PointCount => audioManager.SampleLength;
+
+    private Camera _cam;
+    private float _height;
+    private float _amplitude;
+    private float _width;
+
+    private void Start()
     {
-        get { return audioManager.sampleLength; }
+        _cam = Camera.main;
+        if (_cam != null) _height = _cam.orthographicSize * 2f;
+        
+        _lineRenderer = GetComponent<LineRenderer>();
+
+        _lineRenderer.positionCount = PointCount;
     }
 
-    private Camera cam;
-    private float height;
-    private float amplitude;
-    private float width;
-
-    void Start()
+    private void Update()
     {
-        cam = Camera.main;
-        height = cam.orthographicSize * 2f;
-        ;
-        lineRenderer = GetComponent<LineRenderer>();
-
-        if (lineRenderer == null)
-        {
-            Debug.LogError("LineRenderer component is missing on the AudioWaveVisualizer GameObject.");
-        }
-
-        lineRenderer.positionCount = pointCount;
-    }
-
-    void Update()
-    {
-        amplitude = height / 2f * 0.8f;
-        width = height * cam.aspect;
+        _amplitude = _height / 2f * 0.8f;
+        _width = _height * _cam.aspect;
 
         UpdateWaveform();
     }
 
     void UpdateWaveform()
     {
-        float[] samples = audioManager?.AudioSamples;
+        var samples = audioManager?.AudioSamples;
         if (samples == null || samples.Length == 0) return;
 
-        for (int i = 0; i < pointCount; i++)
+        for (var i = 0; i < PointCount; i++)
         {
-            float x = ((float)i / (pointCount - 1)) * width - (width / 2f);
-            float y = samples[i] * amplitude;
-            Vector3 position = new Vector3(x, y, 0);
-            lineRenderer.SetPosition(i, position);
+            var x = ((float)i / (PointCount - 1)) * _width - (_width / 2f);
+            var y = samples[i] * _amplitude;
+            var position = new Vector3(x, y, 0);
+            _lineRenderer.SetPosition(i, position);
         }
     }
 }

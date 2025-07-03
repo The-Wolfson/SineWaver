@@ -1,11 +1,13 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.Rendering;
 
 public class UIUpdater : MonoBehaviour
 {
     public AudioManager audioManager;
     public TextMeshProUGUI volumeText;
-
+    public TextMeshProUGUI scoreText;
+    
     private void Start()
     {
         // Subscribe to audio events
@@ -29,13 +31,6 @@ public class UIUpdater : MonoBehaviour
 
     private static string FormatVolumeText(float volumeDb)
     {
-        if (volumeDb < AudioManager.MinimumDB)
-        {
-            return "-∞ dB";
-        }
-        else
-        {
-            return $"{volumeDb:F1} dB";
-        }
+        return volumeDb < AudioManager.MinimumDB ? "-∞ dB" : $"{volumeDb:F1} dB";
     }
 }
