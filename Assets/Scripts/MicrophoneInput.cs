@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MicrophoneInput : MonoBehaviour
 {
-    public AudioClip micClip;
+    private AudioClip _micClip;
     public int sampleLength = 1024;
     public float[] samples;
     private int _micSampleRate;
@@ -14,7 +14,7 @@ public class MicrophoneInput : MonoBehaviour
         _micName = Microphone.devices[0];
         _micSampleRate = AudioSettings.outputSampleRate;
 
-        micClip = Microphone.Start(_micName, true, 10, _micSampleRate);
+        _micClip = Microphone.Start(_micName, true, 10, _micSampleRate);
     }
 
     private void Update()
@@ -25,6 +25,6 @@ public class MicrophoneInput : MonoBehaviour
 
         if (startPos < 0) return;
 
-        micClip.GetData(samples, startPos);
+        _micClip.GetData(samples, startPos);
     }
 }

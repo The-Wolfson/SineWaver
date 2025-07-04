@@ -13,11 +13,8 @@ public class AudioManager : MonoBehaviour
     public const float MinimumDB = -80.0f;
 
     // Audio metrics
-    private float CurrentVolumeDb { get; set; }
+    public float CurrentVolumeDb { get; private set; }
     public float[] AudioSamples => micInput?.samples;
-
-    // Events
-    public event Action<float> OnVolumeChanged;
 
     private void Update()
     {
@@ -30,13 +27,10 @@ public class AudioManager : MonoBehaviour
         if (samples == null || samples.Length == 0) return;
 
         // Calculate volume in dB
-        var volumeDb = CalculateVolumeDb(samples);
-        if (volumeDb == CurrentVolumeDb) return;
-        CurrentVolumeDb = volumeDb;
-        OnVolumeChanged?.Invoke(CurrentVolumeDb);
+        CurrentVolumeDb = CalculateVolumeDb(samples);
     }
 
-    public static float CalculateVolumeDb(float[] samples)
+    private static float CalculateVolumeDb(float[] samples)
     {
         // Calculate RMS (Root Mean Square) amplitude
         float sum = 0;
