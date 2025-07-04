@@ -1,29 +1,26 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.Rendering;
 
 public class UIUpdater : MonoBehaviour
 {
     public AudioManager audioManager;
+    public ScoreManager scoreManager;
     public TextMeshProUGUI volumeText;
+    public TextMeshProUGUI targetVolumeText;
     public TextMeshProUGUI scoreText;
+
     
-    private void Start()
+    private void Update()
     {
-        // Subscribe to audio events
-        audioManager.OnVolumeChanged += OnVolumeChanged;
-    }
+        // Update the score text
+        scoreText.text = scoreManager.Score.ToString();
 
-    private void OnDestroy()
-    {
-        audioManager.OnVolumeChanged -= OnVolumeChanged;
-    }
+        targetVolumeText.text = scoreManager.TargetVolume.ToString() + " dB";
 
-    private void OnVolumeChanged(float volumeDb)
-    {
-        UpdateVolumeText(volumeDb);
+        // Update the volume text
+        UpdateVolumeText(audioManager.CurrentVolumeDb);
     }
-
+    
     private void UpdateVolumeText(float volumeDb)
     {
         volumeText.text = FormatVolumeText(volumeDb);

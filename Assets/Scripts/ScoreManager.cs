@@ -1,19 +1,85 @@
-using UnityEngine;
 using System.Collections;
+using System.Timers;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
-    public int score = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    public int Score { get; private set; }
+    public AudioManager audioManager;
+    public int TargetVolume { get; private set; }
+
+    private static readonly Timer GameOverCountdown = new();
+
+    private const float Tolerance = 5f;
+
     void Start()
     {
+
+        Score = 5;
         
+        StartCoroutine(UpdateScore());
+        StartCoroutine(GenerateTargetVolume());
+
+        GameOverCountdown.Elapsed += GameOver;
+        GameOverCountdown.Interval = 10000; // ~ 5 seconds
+        GameOverCountdown.Enabled = true;
+    }
+    
+    void OnDestroy()
+    {
+        GameOverCountdown.Elapsed -= GameOver;
+        GameOverCountdown.Stop();
+        GameOverCountdown.Dispose();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Score <= 0)
+        {
+            GameOver();
+        }
+    }
 
+    IEnumerator GenerateTargetVolume()
+    {
+        while(true)
+        {
+            TargetVolume = Random.Range(-30, -2);
+            yield return new WaitForSeconds(5);
+        }
+    }
+
+    IEnumerator UpdateScore()
+    {
+        while (true)
+        {
+            if (Mathf.Abs(TargetVolume - audioManager.CurrentVolumeDb) < Tolerance)
+            {
+                Score++;
+                GameOverCountdown.Interval = 10000; // ~ 5 seconds
+            }
+            else
+            {
+                Score--;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    void GameOver(object sender, ElapsedEventArgs e)
+    {
+        GameOver();
+    }
+    
+    void GameOver()
+    {
+        Debug.Log("Game Over");
+        SceneManager.LoadScene("GameOver");
     }
 }
 
